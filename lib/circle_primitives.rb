@@ -178,7 +178,7 @@ module CirclePrimitives
       y1 = last_line ? last_line.y2 + 1 : 0
       y2 = y1
 
-      y2 += 1 while diff_to_perfect_circle(x, y2 + 1) < diff_to_perfect_circle(x, y2)
+      y2 += 1 while diff_to_perfect_circle(x, y2 + 1) < diff_to_perfect_circle(x - 1, y2 + 1)
 
       [x, y1, x, y2]
     end
