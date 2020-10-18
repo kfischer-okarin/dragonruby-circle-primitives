@@ -31,8 +31,12 @@ def rendered_canvas(args)
   args.state.canvas
 end
 
+def key_down_or_held?(args, key)
+  keyboard = args.inputs.keyboard
+  keyboard.key_down.send(key) || (keyboard.key_held.send(key) && args.tick_count.mod_zero?(5))
+end
+
 def update_diameter_via_arrow_keys(args)
-  key_down = args.inputs.keyboard.key_down
-  args.state.circle.diameter += 1 if key_down.up
-  args.state.circle.diameter -= 1 if key_down.down
+  args.state.circle.diameter += 1 if key_down_or_held?(args, :up)
+  args.state.circle.diameter -= 1 if key_down_or_held?(args, :down)
 end
