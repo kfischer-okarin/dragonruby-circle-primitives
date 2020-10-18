@@ -53,7 +53,7 @@ class CircleBorder
   private
 
   def render_target_ready?
-    CirclePrimitives.prepared_render_targets.include? @render_target_name
+    CirclePrimitives.ready_render_targets.include? @render_target_name
   end
 end
 
@@ -64,8 +64,12 @@ module CirclePrimitives
       CircleBuilder.new(diameter).prepare_target
     end
 
-    def prepared_render_targets
-      @prepared_render_targets ||= Set.new
+    def ready_render_targets
+      @ready_render_targets ||= Set.new
+    end
+
+    def drawing_render_targets
+      @drawing_render_targets ||= Set.new
     end
   end
 
@@ -87,7 +91,7 @@ module CirclePrimitives
       target.width = @diameter
       target.height = @diameter
       target.primitives << primitives
-      CirclePrimitives.prepared_render_targets << target_name
+      CirclePrimitives.drawing_render_targets << target_name
     end
 
     protected
@@ -214,10 +218,44 @@ module CirclePrimitives
 
     def <<(value)
       @values[value] = true
+      self
     end
 
     def include?(value)
       @values.key? value
     end
+
+    def empty?
+      @values.empty?
+    end
+
+    def clear
+      @values.clear
+      self
+    end
+
+    def merge(enum)
+      enum.each do |element|
+        self << element
+      end
+      self
+    end
+
+    def each(&block)
+      @values.keys.each(&block)
+    end
   end
+
+  # Updates circle render target state
+  module TickCoreExtension
+    def tick_core
+      unless CirclePrimitives.drawing_render_targets.empty?
+        CirclePrimitives.ready_render_targets.merge CirclePrimitives.drawing_render_targets
+        CirclePrimitives.drawing_render_targets.clear
+      end
+
+      super
+    end
+  end
+  GTK::Runtime.prepend TickCoreExtension
 end
