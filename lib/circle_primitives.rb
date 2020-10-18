@@ -6,18 +6,17 @@ class CircleBorder
   def diameter=(value)
     @diameter = value
     @render_target_name = calc_render_target_name
+    prepare_render_target unless render_target_ready?
   end
 
   def initialize(values)
     @x = values[:x]
     @y = values[:y]
-    self.diameter = values[:diameter]
     @r = values[:r] || 255
     @g = values[:g] || 255
     @b = values[:b] || 255
     @a = values[:a] || 255
-
-    prepare_render_target unless render_target_ready?
+    self.diameter = values[:diameter]
   end
 
   def primitive_marker
@@ -48,7 +47,7 @@ class CircleBorder
   end
 
   def prepare_render_target
-    CirclePrimitives::CircleBuilder.new(@diameter).prepare_target
+    CirclePrimitives.prepare_circle_border(@diameter)
   end
 
   private
@@ -61,6 +60,10 @@ end
 # Namespace module
 module CirclePrimitives
   class << self
+    def prepare_circle_border(diameter)
+      CircleBuilder.new(diameter).prepare_target
+    end
+
     def prepared_render_targets
       @prepared_render_targets ||= Set.new
     end

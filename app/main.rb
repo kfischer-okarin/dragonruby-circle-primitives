@@ -5,9 +5,13 @@ def tick(args)
 
   setup_canvas(args)
 
-  canvas_target(args).primitives << CircleBorder.new(x: 0, y: 0, diameter: 20, r: 255, g: 0, b: 0)
+  args.state.circle ||= CircleBorder.new(x: 0, y: 0, diameter: 20, r: 255, g: 0, b: 0)
+
+  canvas_target(args).primitives << args.state.circle
 
   args.outputs.sprites << rendered_canvas(args)
+
+  update_diameter_via_arrow_keys(args)
 end
 
 CANVAS_RENDER_TARGET = :canvas
@@ -25,4 +29,10 @@ end
 
 def rendered_canvas(args)
   args.state.canvas
+end
+
+def update_diameter_via_arrow_keys(args)
+  key_down = args.inputs.keyboard.key_down
+  args.state.circle.diameter += 1 if key_down.up
+  args.state.circle.diameter -= 1 if key_down.down
 end
