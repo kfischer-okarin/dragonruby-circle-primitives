@@ -99,9 +99,9 @@ module CirclePrimitives
     def build
       @lines = CircleEighthBuilder.new(@radius).lines
       @lines += mirror_around_diagonal(@lines)
-      @lines += mirror_vertically(@lines)
-      @lines += mirror_horizontally(@lines)
-      translate_to_render_target_center(@lines)
+      mirror_vertically
+      mirror_horizontally
+      translate(@radius, @radius)
     end
 
     def primitives
@@ -119,20 +119,24 @@ module CirclePrimitives
       lines.map { |line| [line.y1, line.x1, line.y2, line.x2] }
     end
 
-    def mirror_vertically(lines)
-      lines.map { |line| [line.x1, -line.y1 - 1, line.x2, -line.y2 - 1] }
+    def mirror_vertically
+      mirrored = @lines.map { |line| [line.x1, -line.y1 - 1, line.x2, -line.y2 - 1] }
+      translate(0, -1) if @diameter.odd?
+      @lines += mirrored
     end
 
-    def mirror_horizontally(lines)
-      lines.map { |line| [-line.x1 - 1, line.y1, -line.x2 - 1, line.y2] }
+    def mirror_horizontally
+      mirrored = @lines.map { |line| [-line.x1 - 1, line.y1, -line.x2 - 1, line.y2] }
+      translate(-1, 0) if @diameter.odd?
+      @lines += mirrored
     end
 
-    def translate_to_render_target_center(lines)
-      lines.each do |line|
-        line.x1 += @radius
-        line.x2 += @radius
-        line.y1 += @radius
-        line.y2 += @radius
+    def translate(x, y)
+      @lines.each do |line|
+        line.x1 += x
+        line.x2 += x
+        line.y1 += y
+        line.y2 += y
       end
     end
 
