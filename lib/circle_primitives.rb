@@ -110,10 +110,9 @@ module CirclePrimitives
 
     def primitives
       @lines.map { |line|
-        # Fix for DragonRuby Line Render Bug
-        [line.x1, line.y1 + 1, line.x2, line.y2 + 1, 255, 255, 255].line.tap { |primitive|
-          lengthen_by_one(primitive, line)
-        }
+        DragonRubyLineRendering.fix_line_position(
+          [line.x1, line.y1, line.x2, line.y2, 255, 255, 255].line
+        )
       }
     end
 
@@ -144,10 +143,24 @@ module CirclePrimitives
       end
     end
 
-    def lengthen_by_one(primitive, original_line)
-      # Fix for faulty DragonRuby line rendering
-      primitive.x2 += (original_line.x2 >= original_line.x1 ? 1 : -1) if original_line.y1 == original_line.y2
-      primitive.y2 += (original_line.y2 >= original_line.y1 ? 1 : -1) if original_line.x1 == original_line.x2
+    # Fix for DragonRuby Line Render Bug/Strange behaviour
+    module DragonRubyLineRendering
+      def self.fix_line_position(line)
+        shift_up_by_one(line)
+        lengthen_by_one(line)
+        line
+      end
+
+      def self.shift_up_by_one(primitive)
+        primitive.y1 += 1
+        primitive.y2 += 1
+      end
+
+      def self.lengthen_by_one(primitive)
+        # Fix for faulty DragonRuby line rendering
+        primitive.x2 += (primitive.x2 >= primitive.x1 ? 1 : -1) if primitive.y1 == primitive.y2
+        primitive.y2 += (primitive.y2 >= primitive.y1 ? 1 : -1) if primitive.x1 == primitive.x2
+      end
     end
   end
 
