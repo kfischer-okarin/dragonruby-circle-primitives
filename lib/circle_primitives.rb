@@ -135,12 +135,12 @@ module CirclePrimitives
       @lines += mirrored
     end
 
-    def translate(x, y)
+    def translate(offset_x, offset_y)
       @lines.each do |line|
-        line.x1 += x
-        line.x2 += x
-        line.y1 += y
-        line.y2 += y
+        line.x1 += offset_x
+        line.x2 += offset_x
+        line.y1 += offset_y
+        line.y2 += offset_y
       end
     end
 
