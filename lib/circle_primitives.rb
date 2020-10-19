@@ -97,11 +97,15 @@ module CirclePrimitives
     protected
 
     def build
-      @lines = CircleEighthBuilder.new(@radius).lines
-      @lines += mirror_around_diagonal(@lines)
+      @lines = build_quarter
       mirror_vertically
       mirror_horizontally
       translate(@radius, @radius)
+    end
+
+    def build_quarter
+      eighth = CircleEighthBuilder.new(@radius).lines
+      eighth + mirror_around_diagonal(eighth)
     end
 
     def primitives
