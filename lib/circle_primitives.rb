@@ -81,7 +81,7 @@ module CirclePrimitives
 
     def initialize(diameter)
       @diameter = diameter
-      @radius = (diameter / 2).ceil
+      @radius = diameter / 2 - 0.5
       build
     end
 
@@ -100,7 +100,7 @@ module CirclePrimitives
       @lines = build_quarter
       mirror_vertically
       mirror_horizontally
-      translate(@radius, @radius)
+      translate(@radius.ceil, @radius.ceil)
     end
 
     def build_quarter
@@ -180,18 +180,18 @@ module CirclePrimitives
     def build
       while @lines.empty? || last_line_in_0_to_45_degree_segment?
         next_line = build_next_line
-        if longer_than_last_line?(next_line)
-          revert_to_first_line_shorter_than(next_line)
-          lengthen_last_line
-          next
-        end
+        # if longer_than_last_line?(next_line)
+        #   revert_to_first_line_shorter_than(next_line)
+        #   lengthen_last_line
+        #   next
+        # end
         @lines << next_line
       end
     end
 
     def build_next_line
       last_line = @lines.last
-      x = last_line ? last_line.x - 1 : @radius - 1
+      x = last_line ? last_line.x - 1 : @radius.ceil - 1
       y1 = last_line ? last_line.y2 + 1 : 0
       y2 = y1
 
@@ -201,7 +201,7 @@ module CirclePrimitives
     end
 
     def diff_to_perfect_circle(x, y)
-      ((x + 1)**2 + (y + 1)**2 - @radius_sqr).abs
+      ((x + 0.5)**2 + (y + 0.5)**2 - @radius_sqr).abs
     end
 
     def last_line_in_0_to_45_degree_segment?
